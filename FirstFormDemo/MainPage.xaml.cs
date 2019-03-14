@@ -188,5 +188,10 @@ namespace FirstFormDemo
             }
         }
 
+        public void getObjectFromJSON()
+        {
+
+        }
+
     }
 }
