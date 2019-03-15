@@ -3,8 +3,10 @@
     <StackLayout Margin="10, 35, 10, 0">        
         <Label Text="Hi, User" FontSize="Large"/>
         <Entry x:Name="entry"/>
-        <Button x:Name="button" Text="Submit"/>
-        <ListView ItemsSource="{Binding Monkeys}"
+        <Button x:Name="addUser" Text="Submit"/>
+        <Button x:Name="loadList" Text="Load"/>
+        <ActivityIndicator x:Name="delayIndicator" VerticalOptions="CenterAndExpand"/>
+        <ListView x:Name="myList" ItemsSource="{Binding Monkeys}"
           HasUnevenRows="true"
           ItemSelected="OnListViewItemSelected"
           ItemTapped="OnListViewItemTapped">

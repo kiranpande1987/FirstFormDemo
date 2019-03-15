@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.PlatformConfiguration;
@@ -20,7 +22,8 @@ namespace FirstFormDemo
         {
             InitializeComponent();
 
-            button.Clicked += Button_ClickedAsync;
+            addUser.Clicked += Button_ClickedAsync;
+            loadList.Clicked += LoadList_Clicked;
 
             Monkeys = new List<Monkey>();
             Monkeys.Add(new Monkey
@@ -142,15 +145,24 @@ namespace FirstFormDemo
                 ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Gelada-Pavian.jpg/320px-Gelada-Pavian.jpg"
             });
 
-            BindingContext = this;
+            //BindingContext = this;
         }
+
+        void LoadList_Clicked(object sender, EventArgs e)
+        {
+            getResponse();
+        }
+
 
         private async void Button_ClickedAsync(object sender, EventArgs e)
         {
             string name = entry.Text;
 
-            await DisplayAlert("Greetings!!", $"Hello {name}", "OK");
-            getResponse();
+            if (string.IsNullOrEmpty(name))
+                name = "User";
+
+            await DisplayAlert("Greetings!!", $"Hello {name.Trim()}", "OK");
+
         }
 
         void OnListViewItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -167,8 +179,9 @@ namespace FirstFormDemo
 
         public async void getResponse()
         {
+            showDelayIndicator(true);
             var request = new HttpRequestMessage();
-            request.RequestUri = new Uri("https://api.myjson.com/bins/zsf86");
+            request.RequestUri = new Uri("https://api.myjson.com/bins/1a010u");
             request.Method = HttpMethod.Get;
             request.Headers.Add("Accept","application/json");
 
@@ -181,16 +194,31 @@ namespace FirstFormDemo
                 HttpContent content = response.Content;
                 var json = await content.ReadAsStringAsync();
 
+                //await DisplayAlert("Greetings!!", json, "OK");
+                getObjectFromJSON(json);
                 Console.WriteLine(json);
                 //Log.Warning(TAG, json);
 
                 System.Diagnostics.Debug.WriteLine(TAG, json);
             }
+            showDelayIndicator(false);
         }
 
-        public void getObjectFromJSON()
+        public void getObjectFromJSON(string json)
         {
+            var tr = JsonConvert.DeserializeObject<List<Monkey>>(json);
 
+            ObservableCollection<Monkey> trends = new ObservableCollection<Monkey>(tr);
+
+            myList.ItemsSource = trends;
+
+        }
+
+        public void showDelayIndicator(bool isRunning)
+        {
+            myList.IsVisible = !isRunning;
+            delayIndicator.IsRunning = isRunning;
+            delayIndicator.IsVisible = isRunning;
         }
 
     }
